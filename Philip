@@ -1,0 +1,81 @@
+import React, { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+
+const predefinedRoles = {
+  "Software Engineer": { hiringCost: 20000, productivityBoost: 15, engagementScore: 80, trainingInvestment: 5000, retentionBenefit: 10000, benchmarkProductivity: 18 },
+  "Product Manager": { hiringCost: 25000, productivityBoost: 12, engagementScore: 75, trainingInvestment: 6000, retentionBenefit: 12000, benchmarkProductivity: 15 },
+  "Data Scientist": { hiringCost: 22000, productivityBoost: 14, engagementScore: 78, trainingInvestment: 5500, retentionBenefit: 11000, benchmarkProductivity: 16 },
+  "DevOps Engineer": { hiringCost: 21000, productivityBoost: 13, engagementScore: 77, trainingInvestment: 5200, retentionBenefit: 10500, benchmarkProductivity: 17 },
+  "UX Designer": { hiringCost: 19000, productivityBoost: 10, engagementScore: 82, trainingInvestment: 4800, retentionBenefit: 9500, benchmarkProductivity: 14 },
+  "Cybersecurity Analyst": { hiringCost: 23000, productivityBoost: 16, engagementScore: 79, trainingInvestment: 5700, retentionBenefit: 11500, benchmarkProductivity: 17 },
+};
+
+const DiversityROICalculator = () => {
+  const [data, setData] = useState({
+    role: "Software Engineer",
+    workforceDiversity: "",
+    turnoverRate: "",
+    productivity: "",
+  });
+  const [roi, setRoi] = useState(null);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const calculateROI = () => {
+    const roleData = predefinedRoles[data.role];
+    const hiringCosts = roleData.hiringCost;
+    const turnoverSavings = (parseFloat(data.turnoverRate || 0) / 100) * hiringCosts;
+    const productivityBoost = (parseFloat(data.productivity || roleData.productivityBoost) / 100) * hiringCosts;
+    const trainingInvestment = roleData.trainingInvestment;
+    const retentionBenefit = roleData.retentionBenefit;
+    const totalROI = turnoverSavings + productivityBoost + retentionBenefit - trainingInvestment;
+    setRoi(totalROI);
+  };
+
+  return (
+    <Card className="p-6 w-full max-w-lg mx-auto">
+      <CardContent>
+        <h2 className="text-xl font-bold mb-4">Diversity & Inclusion Hiring ROI Calculator</h2>
+        <div className="space-y-4">
+          <Select name="role" value={data.role} onChange={handleChange}>
+            {Object.keys(predefinedRoles).map((role) => (
+              <option key={role} value={role}>{role}</option>
+            ))}
+          </Select>
+          <Input
+            name="workforceDiversity"
+            placeholder="Current Workforce Diversity %"
+            value={data.workforceDiversity}
+            onChange={handleChange}
+          />
+          <Input
+            name="turnoverRate"
+            placeholder="Turnover Rate %"
+            value={data.turnoverRate}
+            onChange={handleChange}
+          />
+          <Input
+            name="productivity"
+            placeholder={`Expected Productivity Increase % (Benchmark: ${predefinedRoles[data.role].benchmarkProductivity}%)`}
+            value={data.productivity}
+            onChange={handleChange}
+          />
+          <Button onClick={calculateROI}>Calculate ROI</Button>
+        </div>
+        {roi !== null && (
+          <div className="mt-4">
+            <h3 className="text-lg font-semibold">Estimated ROI: ${roi.toFixed(2)}</h3>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+export default DiversityROICalculator;
